@@ -1,0 +1,22 @@
+[package]
+name = "bilibili-restapi"
+version = "0.1.0"
+edition = "2021"
+authors = ["stackinspector"]
+license = "MPL-2.0"
+repository = "https://github.com/Berylsoft/bilibili-restapi"
+# description
+# readme
+
+[lib]
+name = "bilibili_restapi"
+path = "lib.rs"
+
+[dependencies]
+concat-string = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_urlencoded = "0.7"
+hyper = { version = "0.14", features = ["http1", "http2", "client", "tcp", "stream"] }
+hyper-rustls = { version = "0.23", features = ["webpki-roots"] }
+tokio = { version = "1", features = ["full"] }
