@@ -96,18 +96,19 @@ impl Client {
 
                 _req.body(Body::empty())
             },
-            RestApiRequestMethod::Post { form } => {
+            RestApiRequestMethod::PostForm => {
                 let mut _req = Request::post(url);
 
                 let csrf = self.csrf()?;
+                let urlencoded = to_urlencoded(req)?;
                 let mut body = concat_string!("csrf=", csrf, "&csrf_token={}", csrf);
                 if let Some(default) = Req::DEFAULT {
                     body.push('&');
                     body.push_str(default);
                 }
-                if form {
+                if urlencoded.len() != 0 {
                     body.push('&');
-                    body.push_str(&to_urlencoded(req)?);
+                    body.push_str(&urlencoded);
                 }
 
                 let headers = _req.headers_mut().unwrap();
@@ -119,6 +120,9 @@ impl Client {
 
                 _req.body(Body::from(body))
             },
+            RestApiRequestMethod::PostJson => {
+                unimplemented!()
+            }
         }.unwrap();
 
         let resp = self.client.request(req).await?;

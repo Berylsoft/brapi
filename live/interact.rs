@@ -41,7 +41,7 @@ impl SendDanmaku {
 
 impl RestApi for SendDanmaku {
     const BIZ: BizKind = BizKind::Live;
-    const METHOD: RestApiRequestMethod = RestApiRequestMethod::Post { form: true };
+    const METHOD: RestApiRequestMethod = RestApiRequestMethod::PostForm;
     const PATH: &'static str = "/msg/send";
     const DEFAULT: Option<&'static str> = None;
     type Response = SentDanmaku;
