@@ -1,0 +1,17 @@
+[package]
+name = "bilibili-restapi-live"
+version = "0.1.0"
+edition = "2021"
+authors = ["stackinspector"]
+license = "MPL-2.0"
+repository = "https://github.com/Berylsoft/bilibili-restapi"
+# description
+# readme
+
+[lib]
+name = "bilibili_restapi_live"
+path = "lib.rs"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+bilibili-restapi-model = { path = "../model" }

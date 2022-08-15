@@ -1,5 +1,4 @@
-use concat_string::concat_string;
-use serde::{Serialize, Deserialize};
+use bilibili_restapi_model::prelude::*;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Access {

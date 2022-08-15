@@ -1,8 +1,8 @@
 use std::collections::BTreeMap;
-use concat_string::concat_string;
 use serde_urlencoded::to_string as to_urlencoded;
 use hyper::{Request, Response, Body, header::{self, HeaderValue, HeaderMap}};
-use crate::{model::*, error::*, access::Access};
+use bilibili_restapi_model::{*, prelude::concat_string};
+use crate::{error::*, access::Access};
 
 pub type HyperClient = hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>;
 

@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use bilibili_restapi_model::{*, prelude::*};
 
 #[derive(Clone, Debug, Serialize)]
 pub struct GetRoomInfo {

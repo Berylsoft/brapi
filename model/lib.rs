@@ -53,10 +53,18 @@ pub const fn referer(biz: BizKind) -> &'static str {
     }
 }
 
+#[macro_export]
 macro_rules! const_json_value_fn_impl {
     ($name: ident, $($json:tt)+) => {
         pub fn $name() -> serde_json::Value {
             serde_json::json!($($json)+)
         }
     };
+}
+
+pub mod prelude {
+    pub use serde::{Serialize, Deserialize, de::DeserializeOwned};
+    pub use concat_string::concat_string;
+    pub use serde_json::{Value as JsonValue, json};
+    pub use serde_repr::{Serialize_repr, Deserialize_repr};
 }
