@@ -67,4 +67,5 @@ pub mod prelude {
     pub use concat_string::concat_string;
     pub use serde_json::{self, Value as JsonValue, json};
     pub use serde_repr::{Serialize_repr, Deserialize_repr};
+    pub use serde_enum_str::{Serialize_enum_str, Deserialize_enum_str};
 }
