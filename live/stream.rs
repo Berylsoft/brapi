@@ -133,23 +133,54 @@ pub struct StreamUrlsV2Inner {
     pub protocols: Vec<StreamUrlsV2Protocol>,
 }
 
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+pub enum ProtocolKind {
+    #[serde(rename = "http_stream")]
+    HttpStream,
+    #[serde(rename = "http_hls")]
+    HttpHLS,
+}
+
 #[derive(Clone, Debug, Deserialize)]
 pub struct StreamUrlsV2Protocol {
-    pub protocol_name: String,
+    #[serde(rename = "protocol_name")]
+    pub protocol_kind: ProtocolKind,
     #[serde(rename = "format")]
     pub formats: Vec<StreamUrlsV2Format>,
 }
 
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[allow(non_camel_case_types)]
+pub enum FormatKind {
+    #[serde(rename = "flv")]
+    HTTP_FLV,
+    #[serde(rename = "ts")]
+    HLS_TS,
+    #[serde(rename = "fmp4")]
+    HLS_FMP4,
+}
+
 #[derive(Clone, Debug, Deserialize)]
 pub struct StreamUrlsV2Format {
-    pub format_name: String,
+    #[serde(rename = "format_name")]
+    pub format_kind: FormatKind,
     #[serde(rename = "codec")]
     pub codecs: Vec<StreamUrlsV2Codec>,
 }
 
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[allow(non_camel_case_types)]
+pub enum CodecKind {
+    #[serde(rename = "avc")]
+    AVC,
+    #[serde(rename = "hevc")]
+    HEVC,
+}
+
 #[derive(Clone, Debug, Deserialize)]
 pub struct StreamUrlsV2Codec {
-    pub codec_name: String,
+    #[serde(rename = "codec_name")]
+    pub codec_kind: CodecKind,
     #[serde(flatten)]
     pub urls: StreamUrlV2,
 }
