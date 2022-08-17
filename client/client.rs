@@ -60,7 +60,7 @@ impl Client {
         self.client.clone()
     }
 
-    pub async fn raw_get_url(&self, url: hyper::Uri) -> HttpResult<Response<Body>> {
+    pub async fn raw_get(&self, url: hyper::Uri) -> HttpResult<Response<Body>> {
         self.client.get(url).await
     }
 
@@ -121,6 +121,7 @@ impl Client {
                 _req.body(Body::from(body))
             },
             RestApiRequestMethod::PostJson => {
+                assert_eq!(Req::DEFAULT, None);
                 unimplemented!()
             }
         }.unwrap();

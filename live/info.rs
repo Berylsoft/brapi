@@ -2,7 +2,7 @@ use bilibili_restapi_model::{*, prelude::*};
 
 #[derive(Clone, Debug, Serialize)]
 pub struct GetRoomInfo {
-    #[serde(rename = "id")]
+    #[serde(rename(serialize = "id"))]
     pub sroomid: u32,
 }
 
@@ -58,7 +58,7 @@ pub struct UserInfo {
 
 #[derive(Clone, Debug, Serialize)]
 pub struct GetUserInfo {
-    #[serde(rename = "roomid")]
+    #[serde(rename(serialize = "roomid"))]
     pub sroomid: u32,
 }
 
@@ -72,7 +72,7 @@ impl RestApi for GetUserInfo {
 
 #[derive(Clone, Debug, Serialize)]
 pub struct GetExtRoomInfo {
-    #[serde(rename = "room_id")]
+    #[serde(rename(serialize = "room_id"))]
     pub sroomid: u32,
 }
 

@@ -2,7 +2,7 @@ use bilibili_restapi_model::{*, prelude::*};
 
 #[derive(Clone, Debug, Serialize)]
 pub struct GetHostsInfo {
-    #[serde(rename = "id")]
+    #[serde(rename(serialize = "id"))]
     pub roomid: u32,
 }
 
