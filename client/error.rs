@@ -7,18 +7,11 @@ pub enum RestApiFailureCode {
 }
 
 macro_rules! error_conv_impl {
-    ($name:ident, $($variant:ident => $error:ty),*, $(,)?) => {
+    {$name:ident {$($extra:tt)+} conv {$($variant:ident => $error:ty),*,}} => {
         #[derive(Debug)]
         pub enum $name {
-            $(
-                $variant($error),
-            )*
-            Failure {
-                code: RestApiFailureCode,
-                payload: String,
-                rate_limited: bool,
-            },
-            PostWithoutAccess,
+            $($variant($error),)*
+            $($extra)+
         }
 
         $(
@@ -31,14 +24,24 @@ macro_rules! error_conv_impl {
     };
 }
 
-error_conv_impl!(
-    RestApiError,
-    Network        => HttpError,
-    ParseString    => std::string::FromUtf8Error,
-    ParseStr       => std::str::Utf8Error,
-    Parse          => serde_json::Error,
-    EncodePostBody => serde_urlencoded::ser::Error,
-);
+error_conv_impl! {
+    RestApiError
+    {
+        Failure {
+            code: RestApiFailureCode,
+            payload: String,
+            rate_limited: bool,
+        },
+        PostWithoutAccess,
+    }
+    conv {
+        Network        => HttpError,
+        ParseString    => std::string::FromUtf8Error,
+        ParseStr       => std::str::Utf8Error,
+        Parse          => serde_json::Error,
+        EncodePostBody => serde_urlencoded::ser::Error,
+    }
+}
 
 impl std::fmt::Display for RestApiError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
