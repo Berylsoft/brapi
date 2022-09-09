@@ -1,0 +1,18 @@
+[package]
+name = "bilibili-restapi-cli-live"
+version = "0.1.0"
+edition = "2021"
+authors = ["stackinspector"]
+license = "MPL-2.0"
+repository = "https://github.com/Berylsoft/bilibili-restapi"
+# description
+# readme
+
+[lib]
+name = "bilibili_restapi_cli_live"
+path = "lib.rs"
+
+[dependencies]
+argh = "0.1"
+bilibili-restapi-client = { path = "../../client" }
+bilibili-restapi-live = { path = "../../live" }

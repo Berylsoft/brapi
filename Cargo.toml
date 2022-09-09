@@ -5,4 +5,6 @@ members = [
     "client",
     "live",
     "bilibili-restapi",
+    "cli/live",
+    "cli/main",
 ]
