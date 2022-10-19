@@ -6,27 +6,9 @@ pub enum RestApiFailureCode {
     FromApi { code: i32, message: String },
 }
 
-macro_rules! error_conv_impl {
-    {$name:ident {$($extra:tt)+} conv {$($variant:ident => $error:ty),*,}} => {
-        #[derive(Debug)]
-        pub enum $name {
-            $($variant($error),)*
-            $($extra)+
-        }
-
-        $(
-            impl From<$error> for $name {
-                fn from(err: $error) -> $name {
-                    <$name>::$variant(err)
-                }
-            }
-        )*
-    };
-}
-
-error_conv_impl! {
-    RestApiError
-    {
+macros::error_enum! {
+    #[derive(Debug)]
+    RestApiError {
         Failure {
             code: RestApiFailureCode,
             payload: String,
@@ -34,7 +16,7 @@ error_conv_impl! {
         },
         PostWithoutAccess,
     }
-    conv {
+    convert {
         Network        => HttpError,
         ParseString    => std::string::FromUtf8Error,
         ParseStr       => std::str::Utf8Error,

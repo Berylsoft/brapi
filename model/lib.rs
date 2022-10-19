@@ -30,11 +30,11 @@ pub enum RestApiRequestMethod {
 #[derive(Deserialize)]
 pub struct RestApiResponse<Data> { // Data: DeserializeOwned
     pub code: i32,
-    pub data: Data,
+    pub data: Data, // Option<Data> ?
     pub message: String,
 }
 
-pub const WEB_USER_AGENT: &'static str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36";
+pub const WEB_USER_AGENT: &'static str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36";
 
 pub const fn api_host(biz: BizKind) -> &'static str {
     match biz {
@@ -64,8 +64,8 @@ macro_rules! const_json_value_fn_impl {
 
 pub mod prelude {
     pub use serde::{self, Serialize, Deserialize, de::DeserializeOwned};
-    pub use concat_string::concat_string;
     pub use serde_json::{self, Value as JsonValue, json};
     pub use serde_repr::{Serialize_repr, Deserialize_repr};
     pub use serde_enum_str::{Serialize_enum_str, Deserialize_enum_str};
+    pub use macros::concat_string;
 }
