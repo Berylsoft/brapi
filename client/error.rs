@@ -6,9 +6,9 @@ pub enum RestApiFailureCode {
     FromApi { code: i32, message: String },
 }
 
-macros::error_enum! {
+foundations::error_enum! {
     #[derive(Debug)]
-    RestApiError {
+    pub enum RestApiError {
         Failure {
             code: RestApiFailureCode,
             payload: String,
