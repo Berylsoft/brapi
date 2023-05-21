@@ -4,6 +4,7 @@ members = [
     "model",
     "client",
     "live",
+    "tag",
     "bilibili-restapi",
     "cli/live",
     "cli/main",

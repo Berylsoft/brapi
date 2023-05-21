@@ -4,6 +4,7 @@ use serde::{Serialize, Deserialize, de::DeserializeOwned};
 pub enum BizKind {
     Common { from_page: CommonFromPageKind },
     Live,
+    LegacyDynamic,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -40,6 +41,7 @@ pub const fn api_host(biz: BizKind) -> &'static str {
     match biz {
         BizKind::Common { .. } => "https://api.bilibili.com",
         BizKind::Live => "https://api.live.bilibili.com",
+        BizKind::LegacyDynamic => "https://api.vc.bilibili.com/",
     }
 }
 
@@ -50,6 +52,7 @@ pub const fn referer(biz: BizKind) -> &'static str {
             CommonFromPageKind::Dynamic => "https://t.bilibili.com/",
         },
         BizKind::Live => "https://live.bilibili.com/",
+        BizKind::LegacyDynamic => "https://t.bilibili.com/",
     }
 }
 
