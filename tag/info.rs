@@ -7,7 +7,7 @@ pub struct GetTagInfo {
 }
 
 impl RestApi for GetTagInfo {
-    const BIZ: BizKind = BizKind::Common { from_page: CommonFromPageKind::Dynamic };
+    const BIZ: BizKind = BizKind::Common { from: Some(CommonFrom::LegacyDynamic) };
     const METHOD: RestApiRequestMethod = RestApiRequestMethod::BareGet;
     const PATH: &'static str = "/x/tag/info";
     const DEFAULT: Option<&'static str> = None;

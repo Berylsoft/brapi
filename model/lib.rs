@@ -2,15 +2,35 @@ use serde::{Serialize, Deserialize, de::DeserializeOwned};
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum BizKind {
-    Common { from_page: CommonFromPageKind },
+    Common { from: Option<CommonFrom> },
     Live,
     LegacyDynamic,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum CommonFromPageKind {
-    Home,
-    Dynamic,
+pub enum CommonFrom {
+    LegacyDynamic,
+}
+
+impl BizKind {
+    pub fn host(&self) -> &'static str {
+        match self {
+            BizKind::Common { .. } => "https://api.bilibili.com",
+            BizKind::Live => "https://api.live.bilibili.com",
+            BizKind::LegacyDynamic => "https://api.vc.bilibili.com",
+        }
+    }
+
+    pub fn referer(&self) -> &'static str {
+        match self {
+            BizKind::Common { from } => match from {
+                None => "https://www.bilibili.com/",
+                Some(CommonFrom::LegacyDynamic) => "https://t.bilibili.com/",
+            },
+            BizKind::Live => "https://live.bilibili.com/",
+            BizKind::LegacyDynamic => "https://t.bilibili.com/",
+        }
+    }
 }
 
 pub trait RestApi: Serialize {
@@ -33,27 +53,6 @@ pub struct RestApiResponse<Data> { // Data: DeserializeOwned
     pub code: i32,
     pub data: Data, // Option<Data> ?
     pub message: String,
-}
-
-pub const WEB_USER_AGENT: &'static str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36";
-
-pub const fn api_host(biz: BizKind) -> &'static str {
-    match biz {
-        BizKind::Common { .. } => "https://api.bilibili.com",
-        BizKind::Live => "https://api.live.bilibili.com",
-        BizKind::LegacyDynamic => "https://api.vc.bilibili.com/",
-    }
-}
-
-pub const fn referer(biz: BizKind) -> &'static str {
-    match biz {
-        BizKind::Common { from_page } => match from_page {
-            CommonFromPageKind::Home => "https://www.bilibili.com/",
-            CommonFromPageKind::Dynamic => "https://t.bilibili.com/",
-        },
-        BizKind::Live => "https://live.bilibili.com/",
-        BizKind::LegacyDynamic => "https://t.bilibili.com/",
-    }
 }
 
 #[macro_export]

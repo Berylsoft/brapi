@@ -4,6 +4,8 @@ use hyper::{Request, Response, Body, header::{self, HeaderValue, HeaderMap}};
 use bilibili_restapi_model::{*, prelude::concat_string};
 use crate::{error::*, access::Access};
 
+pub const WEB_USER_AGENT: &'static str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36";
+
 pub type HyperClient = hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>;
 
 fn build_hyper_client() -> HyperClient {
@@ -36,8 +38,8 @@ impl Client {
     }
 
     pub fn set_headers(&self, biz: BizKind, headers: &mut HeaderMap) {
-        headers.insert(header::REFERER, HeaderValue::from_static(referer(biz)));
-        headers.insert(header::ORIGIN, HeaderValue::from_static(referer(biz)));
+        headers.insert(header::REFERER, HeaderValue::from_static(biz.referer()));
+        headers.insert(header::ORIGIN, HeaderValue::from_static(biz.referer()));
         headers.insert(header::USER_AGENT, HeaderValue::from_static(WEB_USER_AGENT));
         if let Some(access) = &self.access {
             let mut cookie = HeaderValue::from_str(access.as_cookie().as_str()).unwrap();
@@ -66,30 +68,26 @@ impl Client {
 
     pub async fn call<Req: RestApi>(&self, req: &Req) -> RestApiResult<Req::Response> {
         let host = match self.proxy.get(&Req::BIZ) {
-            None => api_host(Req::BIZ),
+            None => Req::BIZ.host(),
             Some(proxy) => proxy.as_str(),
         };
-        let url = concat_string!(host, Req::PATH);
+        let mut url = concat_string!(host, Req::PATH);
 
         let req = match Req::METHOD {
             RestApiRequestMethod::BareGet | RestApiRequestMethod::Get => {
                 let urlencoded = to_urlencoded(req)?;
-                let url = if matches!(Req::DEFAULT, None) && urlencoded.len() == 0 {
-                    url
-                } else {
-                    let mut url = url;
+                if Req::DEFAULT.is_some() || !urlencoded.is_empty() {
                     url.push('?');
                     url.push_str(&urlencoded);
                     if let Some(default) = Req::DEFAULT {
                         url.push('&');
                         url.push_str(default);
                     }
-                    url
-                };
+                }
 
                 let mut _req = Request::get(url);
 
-                if matches!(Req::METHOD, RestApiRequestMethod::Get) {
+                if let RestApiRequestMethod::Get = Req::METHOD {
                     let headers = _req.headers_mut().unwrap();
                     self.set_headers(Req::BIZ, headers);
                 }
