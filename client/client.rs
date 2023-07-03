@@ -37,6 +37,10 @@ impl Client {
         Client::new(None, None)
     }
 
+    pub fn uid(&self) -> Option<u64> {
+        self.access.as_ref().map(|access| access.uid)
+    }
+
     pub fn set_headers(&self, biz: BizKind, headers: &mut HeaderMap) {
         headers.insert(header::REFERER, HeaderValue::from_static(biz.referer()));
         headers.insert(header::ORIGIN, HeaderValue::from_static(biz.referer()));
