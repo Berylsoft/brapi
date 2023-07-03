@@ -13,7 +13,7 @@ name = "bilibili_restapi_tag"
 path = "lib.rs"
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
 bilibili-restapi-model = { path = "../model" }
 
 [features]

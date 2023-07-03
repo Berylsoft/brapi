@@ -14,7 +14,7 @@ path = "main.rs"
 
 [dependencies]
 argh = "0.1"
-serde_json = "1.0"
+serde_json = "1"
 tokio = { version = "1", features = ["full"] }
 bilibili-restapi-cli-live = { path = "../live" }
 bilibili-restapi-client = { path = "../../client" }

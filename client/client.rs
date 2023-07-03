@@ -12,7 +12,7 @@ fn build_hyper_client() -> HyperClient {
     let conn = hyper_rustls::HttpsConnectorBuilder::new()
         .with_webpki_roots()
         .https_only()
-        .enable_http1()
+        .enable_http2()
         .build();
     hyper::Client::builder().build(conn)
 }
