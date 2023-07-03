@@ -22,7 +22,7 @@ pub struct HostInfo {
 
 impl RestApi for GetHostsInfo {
     const BIZ: BizKind = BizKind::Live;
-    const METHOD: RestApiRequestMethod = RestApiRequestMethod::BareGet;
+    const METHOD: RestApiRequestMethod = RestApiRequestMethod::Get;
     const PATH: &'static str = "/xlive/web-room/v1/index/getDanmuInfo";
     const DEFAULT: Option<&'static str> = Some("type=0");
     type Response = HostsInfo;
