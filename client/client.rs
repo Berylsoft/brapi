@@ -41,6 +41,10 @@ impl Client {
         self.access.as_ref().map(|access| access.uid)
     }
 
+    pub fn devid3(&self) -> Option<String> {
+        self.access.as_ref().map(|access| access.devid3.clone())
+    }
+
     pub fn set_headers(&self, biz: BizKind, headers: &mut HeaderMap) {
         headers.insert(header::REFERER, HeaderValue::from_static(biz.referer()));
         headers.insert(header::ORIGIN, HeaderValue::from_static(biz.referer()));

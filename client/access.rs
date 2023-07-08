@@ -5,6 +5,7 @@ pub struct Access {
     pub uid: u64,
     pub key: String,
     pub csrf: String,
+    pub devid3: String,
 }
 
 fn split_into_kv(pair: &str, pat: char) -> Option<(&str, &str)> {
@@ -15,49 +16,45 @@ fn split_into_kv(pair: &str, pat: char) -> Option<(&str, &str)> {
 const K_UID: &str = "DedeUserID";
 const K_KEY: &str = "SESSDATA";
 const K_CSRF: &str = "bili_jct";
+const K_DEVID3: &str = "buvid3";
 
 impl Access {
     pub fn from_cookie<S: AsRef<str>>(cookie: S) -> Option<Access> {
-        macro_rules! seat {
-            ($name:tt, $ty:ty) => {
-                let mut $name: Option<$ty> = None;
-            };
-        }
+        macro_rules! seat_impl {
+            ($struct:tt, $input:expr; $($name:tt, $k:pat, $ty:ty;)*) => {{
+                $(let mut $name: Option<$ty> = None;)*
 
-        macro_rules! occupy {
-            ($name:ident, $value:expr) => {{
-                if let Some(_) = $name.replace($value) { return None };
+                for pair in $input.split(';') {
+                    let (k, v) = split_into_kv(pair.trim(), '=')?;
+                    let (k, v) = (k.trim(), v.trim());
+
+                    match k {
+                        $($k => { if let Some(_) = $name.replace(v.parse().ok()?) { return None }; })*
+                        _ => { },
+                    }
+                }
+
+                Some($struct {
+                    $($name: $name?,)*
+                })
             }};
         }
 
-        seat!(uid, u64);
-        seat!(key, String);
-        seat!(csrf, String);
-
-        for pair in cookie.as_ref().split(';') {
-            let (k, v) = split_into_kv(pair.trim(), '=')?;
-            let (k, v) = (k.trim(), v.trim());
-
-            match k {
-                K_UID => occupy!(uid, v.parse().ok()?),
-                K_KEY => occupy!(key, v.to_owned()),
-                K_CSRF => occupy!(csrf, v.to_owned()),
-                _ => { },
-            }
-        }
-
-        Some(Access {
-            uid: uid?,
-            key: key?,
-            csrf: csrf?,
-        })
+        seat_impl!(
+            Access, cookie.as_ref();
+            uid, K_UID, u64;
+            key, K_KEY, String;
+            csrf, K_CSRF, String;
+            devid3, K_DEVID3, String;
+        )
     }
 
     pub fn as_cookie(&self) -> String {
         concat_string!(
             K_UID, "=", self.uid.to_string(), "; ",
             K_KEY, "=", self.key, "; ",
-            K_CSRF, "=", self.csrf
+            K_CSRF, "=", self.csrf, "; ",
+            K_DEVID3, "=", self.devid3
         )
     }
 }
