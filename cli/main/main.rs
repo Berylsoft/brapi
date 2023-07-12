@@ -1,8 +1,8 @@
 use std::{path::PathBuf, fs};
-use bilibili_restapi_client::{client::Client, access::Access};
-use bilibili_restapi_cli_live::Request as LiveRequest;
+use brapi_client::{client::Client, access::Access};
+use brapi_cli_live::Request as LiveRequest;
 
-/// Berylsoft bilibili-restapi CLI
+/// Berylsoft brapi CLI
 #[derive(argh::FromArgs)]
 struct Args {
     /// json access file path

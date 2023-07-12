@@ -1,6 +1,6 @@
-# Bilibili REST API
+# BRAPI
 
-The second Rust implementation on GitHub of third-party REST API client for Bilibili. Designed to be lightweight and efficient.
+The second Rust implementation on GitHub of third-party REST API client for a website. Designed to be lightweight and efficient.
 
 It's formerly `livekit-api` ([LiveKit](https://github.com/Berylsoft/LiveKit)), so there are only a few APIs related to Bilibili Live. More APIs will be implemented later. PRs are also welcomed.
 
@@ -11,7 +11,7 @@ It's formerly `livekit-api` ([LiveKit](https://github.com/Berylsoft/LiveKit)), s
 - Parse `Access` from cookies for requests that require login.
 
 ```rust
-use bilibili_restapi::{client::Client, live::info::GetRoomInfo};
+use brapi::{client::Client, live::info::GetRoomInfo};
 let client = Client::new_bare();
 let room_info = client.call(&GetRoomInfo { sroomid: 23590843 }).await.unwrap();
 assert_eq!(room_info.uid, 573732342);

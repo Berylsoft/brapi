@@ -1,5 +1,5 @@
-use bilibili_restapi_client::client::Client;
-use bilibili_restapi_live as api;
+use brapi_client::client::Client;
+use brapi_live as api;
 
 fn now_signed() -> i64 {
     use std::time::{SystemTime, UNIX_EPOCH};

@@ -1,6 +1,6 @@
 #![allow(non_camel_case_types)] // for `FormatKind` only but invalid after proc macro of `serde-enum-str`
 
-use bilibili_restapi_model::{*, prelude::*};
+use brapi_model::{*, prelude::*};
 
 #[derive(Clone, Debug, Serialize)]
 pub struct GetStreamInfoV1 {

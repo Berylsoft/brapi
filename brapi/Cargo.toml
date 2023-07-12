@@ -1,5 +1,5 @@
 [package]
-name = "brapi-cli-live"
+name = "brapi"
 version = "0.1.0"
 edition = "2021"
 authors = ["stackinspector"]
@@ -9,10 +9,11 @@ repository = "https://github.com/Berylsoft/brapi"
 # readme
 
 [lib]
-name = "brapi_cli_live"
+name = "brapi"
 path = "lib.rs"
 
 [dependencies]
-argh = "0.1"
-brapi-client = { path = "../../client" }
-brapi-live = { path = "../../live" }
+brapi-model = { path = "../model" }
+brapi-client = { path = "../client" }
+
+brapi-live = { path = "../live" }

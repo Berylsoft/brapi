@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 use serde_urlencoded::to_string as to_urlencoded;
 use hyper::{Request, Response, Body, header::{self, HeaderValue, HeaderMap}};
-use bilibili_restapi_model::{*, prelude::concat_string};
+use brapi_model::{*, prelude::concat_string};
 use crate::{error::*, access::Access};
 
 pub const WEB_USER_AGENT: &'static str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36";

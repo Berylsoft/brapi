@@ -1,4 +1,4 @@
-use bilibili_restapi_model::prelude::*;
+use brapi_model::prelude::*;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Access {

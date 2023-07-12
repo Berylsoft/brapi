@@ -1,15 +1,15 @@
 [package]
-name = "bilibili-restapi-client"
+name = "brapi-client"
 version = "0.1.0"
 edition = "2021"
 authors = ["stackinspector"]
 license = "MPL-2.0"
-repository = "https://github.com/Berylsoft/bilibili-restapi"
+repository = "https://github.com/Berylsoft/brapi"
 # description
 # readme
 
 [lib]
-name = "bilibili_restapi_client"
+name = "brapi_client"
 path = "lib.rs"
 
 [dependencies]
@@ -19,4 +19,4 @@ serde_urlencoded = "0.7"
 hyper = { version = "0.14", features = ["http1", "http2", "client", "tcp", "stream"] }
 hyper-rustls = { version = "0.24", default-features = false, features = ["webpki-tokio", "http2"] }
 foundations = { git = "https://github.com/Berylsoft/foundations", features = ["error-enum"] }
-bilibili-restapi-model = { path = "../model" }
+brapi-model = { path = "../model" }

@@ -1,20 +1,20 @@
 [package]
-name = "bilibili-restapi-tag"
+name = "brapi-tag"
 version = "0.1.0"
 edition = "2021"
 authors = ["stackinspector"]
 license = "MPL-2.0"
-repository = "https://github.com/Berylsoft/bilibili-restapi"
+repository = "https://github.com/Berylsoft/brapi"
 # description
 # readme
 
 [lib]
-name = "bilibili_restapi_tag"
+name = "brapi_tag"
 path = "lib.rs"
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }
-bilibili-restapi-model = { path = "../model" }
+brapi-model = { path = "../model" }
 
 [features]
 unclarified_fields = []
