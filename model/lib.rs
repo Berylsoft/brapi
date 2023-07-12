@@ -1,5 +1,12 @@
 use serde::{Serialize, Deserialize, de::DeserializeOwned};
 
+#[macro_export]
+macro_rules! name {
+    () => {
+        include!("name")
+    };
+}
+
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum BizKind {
     Common { from: Option<CommonFrom> },
@@ -15,20 +22,20 @@ pub enum CommonFrom {
 impl BizKind {
     pub fn host(&self) -> &'static str {
         match self {
-            BizKind::Common { .. } => "https://api.bilibili.com",
-            BizKind::Live => "https://api.live.bilibili.com",
-            BizKind::LegacyDynamic => "https://api.vc.bilibili.com",
+            BizKind::Common { .. } => concat!("https://api.", name!(), ".com"),
+            BizKind::Live => concat!("https://api.live.", name!(), ".com"),
+            BizKind::LegacyDynamic => concat!("https://api.vc.", name!(), ".com"),
         }
     }
 
     pub fn referer(&self) -> &'static str {
         match self {
             BizKind::Common { from } => match from {
-                None => "https://www.bilibili.com/",
-                Some(CommonFrom::LegacyDynamic) => "https://t.bilibili.com/",
+                None => concat!("https://www.", name!(), ".com/"),
+                Some(CommonFrom::LegacyDynamic) => concat!("https://t.", name!(), ".com/"),
             },
-            BizKind::Live => "https://live.bilibili.com/",
-            BizKind::LegacyDynamic => "https://t.bilibili.com/",
+            BizKind::Live => concat!("https://live.", name!(), ".com/"),
+            BizKind::LegacyDynamic => concat!("https://t.", name!(), ".com/"),
         }
     }
 }
