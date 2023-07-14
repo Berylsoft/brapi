@@ -33,7 +33,7 @@ pub struct Danmaku {
 impl Danmaku {
     pub fn conv(self) -> api::interact::SendDanmaku {
         let Danmaku { roomid, text: msg, rand: rnd, emoji } = self;
-        let rnd = rnd.unwrap_or_else(|| now_signed());
+        let rnd = rnd.unwrap_or_else(now_signed);
         api::interact::SendDanmaku::new(roomid, msg, rnd, emoji)
     }
 }

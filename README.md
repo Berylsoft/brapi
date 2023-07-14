@@ -2,7 +2,7 @@
 
 The second Rust implementation on GitHub of third-party REST API client for a website. Designed to be lightweight and efficient.
 
-It's formerly `livekit-api` ([LiveKit](https://github.com/Berylsoft/LiveKit)), so there are only a few APIs related to Bilibili Live. More APIs will be implemented later. PRs are also welcomed.
+It's formerly `livekit-api` ([LiveKit](https://github.com/Berylsoft/LiveKit)), so there are only a few APIs related to live business. More APIs will be implemented later. PRs are also welcomed.
 
 - Abstract the API to the trait `RestApi`, bringing both clear readable code and reduced runtime overhead. And you are able to implement your own API!
 
