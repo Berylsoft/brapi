@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, sync::Arc};
 use serde_urlencoded::to_string as to_urlencoded;
 use hyper::{Request, Response, Body, header::{self, HeaderValue, HeaderMap}};
 use brapi_model::{*, prelude::concat_string};
@@ -20,16 +20,16 @@ fn build_hyper_client() -> HyperClient {
 #[derive(Clone)]
 pub struct Client {
     client: HyperClient,
-    access: Option<Access>,
-    proxy: BTreeMap<BizKind, String>,
+    access: Option<Arc<Access>>,
+    proxy: Arc<BTreeMap<BizKind, String>>,
 }
 
 impl Client {
     pub fn new(access: Option<Access>, proxy: Option<BTreeMap<BizKind, String>>) -> Client {
         Client {
             client: build_hyper_client(),
-            access,
-            proxy: proxy.unwrap_or_default(),
+            access: access.map(Arc::new),
+            proxy: Arc::new(proxy.unwrap_or_default()),
         }
     }
 
@@ -75,7 +75,7 @@ impl Client {
     }
 
     pub async fn call<Req: RestApi>(&self, req: &Req) -> RestApiResult<Req::Response> {
-        let host = match self.proxy.get(&Req::BIZ) {
+        let host = match self.proxy.as_ref().get(&Req::BIZ) {
             None => Req::BIZ.host(),
             Some(proxy) => proxy.as_str(),
         };
