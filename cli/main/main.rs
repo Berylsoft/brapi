@@ -1,5 +1,5 @@
 use std::{path::PathBuf, fs};
-use brapi_client::{client::Client, access::Access};
+use brapi_client::client::Client;
 use brapi_cli_live::Request as LiveRequest;
 
 /// Berylsoft brapi CLI
@@ -31,8 +31,8 @@ struct LiveArgs {
 async fn main() {
     let Args { access_path, inner } = argh::from_env();
     let access_path = access_path.unwrap_or_else(|| std::env::var_os("BAPI_ACCESS_PATH").unwrap().into());
-    let access: Access = serde_json::from_reader(fs::OpenOptions::new().read(true).open(access_path).unwrap()).unwrap();
-    let client = Client::new(Some(access), None);
+    let access = fs::read_to_string(access_path).unwrap();
+    let client = Client::with_access(access, None).unwrap();
     match inner {
         Request::Live(LiveArgs { inner }) => inner.call(client).await,
     }

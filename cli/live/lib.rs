@@ -1,4 +1,4 @@
-use brapi_client::client::Client;
+use brapi_client::client::ClientRef;
 use brapi_live as api;
 
 fn now_signed() -> i64 {
@@ -39,7 +39,7 @@ impl Danmaku {
 }
 
 impl Request {
-    pub async fn call(self, client: Client) {
+    pub async fn call(self, client: ClientRef) {
         match self {
             Request::Danmaku(payload) => println!("{:?}", client.call(&payload.conv()).await),
         }

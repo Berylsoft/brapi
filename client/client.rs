@@ -17,24 +17,35 @@ fn build_hyper_client() -> HyperClient {
     hyper::Client::builder().build(conn)
 }
 
-#[derive(Clone)]
 pub struct Client {
     client: HyperClient,
-    access: Option<Arc<Access>>,
-    proxy: Arc<BTreeMap<BizKind, String>>,
+    access: Option<Access>,
+    proxy: BTreeMap<BizKind, String>,
 }
 
+pub type ClientRef = Arc<Client>;
+
 impl Client {
-    pub fn new(access: Option<Access>, proxy: Option<BTreeMap<BizKind, String>>) -> Client {
-        Client {
+    fn _new(access: Option<Access>, proxy: Option<BTreeMap<BizKind, String>>) -> ClientRef {
+        let client = Client {
             client: build_hyper_client(),
-            access: access.map(Arc::new),
-            proxy: Arc::new(proxy.unwrap_or_default()),
-        }
+            access,
+            proxy: proxy.unwrap_or_default(),
+        };
+        Arc::new(client)
     }
 
-    pub fn new_bare() -> Client {
-        Client::new(None, None)
+    pub fn with_access(access: String, proxy: Option<BTreeMap<BizKind, String>>) -> Option<ClientRef> {
+        let access = Access::from_raw(access)?;
+        Some(Client::_new(Some(access), proxy))
+    }
+
+    pub fn without_access(proxy: Option<BTreeMap<BizKind, String>>) -> ClientRef {
+        Client::_new(None, proxy)
+    }
+
+    pub fn bare() -> ClientRef {
+        Client::_new(None, None)
     }
 
     pub fn uid(&self) -> Option<u64> {
@@ -45,12 +56,12 @@ impl Client {
         self.access.as_ref().map(|access| access.devid3.clone())
     }
 
-    pub fn set_headers(&self, biz: BizKind, headers: &mut HeaderMap) {
+    fn set_headers(&self, biz: BizKind, headers: &mut HeaderMap) {
         headers.insert(header::REFERER, HeaderValue::from_static(biz.referer()));
         headers.insert(header::ORIGIN, HeaderValue::from_static(biz.referer()));
         headers.insert(header::USER_AGENT, HeaderValue::from_static(WEB_USER_AGENT));
         if let Some(access) = &self.access {
-            let mut cookie = HeaderValue::from_str(access.as_cookie().as_str()).unwrap();
+            let mut cookie = HeaderValue::from_str(&access.raw).unwrap();
             cookie.set_sensitive(true);
             headers.insert(header::COOKIE, cookie);
         }
@@ -75,7 +86,7 @@ impl Client {
     }
 
     pub async fn call<Req: RestApi>(&self, req: &Req) -> RestApiResult<Req::Response> {
-        let host = match self.proxy.as_ref().get(&Req::BIZ) {
+        let host = match self.proxy.get(&Req::BIZ) {
             None => Req::BIZ.host(),
             Some(proxy) => proxy.as_str(),
         };

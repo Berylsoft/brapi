@@ -6,6 +6,8 @@ pub struct Access {
     pub key: String,
     pub csrf: String,
     pub devid3: String,
+    // TODO use Bytes
+    pub raw: String,
 }
 
 fn split_into_kv(pair: &str, pat: char) -> Option<(&str, &str)> {
@@ -19,9 +21,9 @@ const K_CSRF: &str = "bili_jct";
 const K_DEVID3: &str = "buvid3";
 
 impl Access {
-    pub fn from_cookie<S: AsRef<str>>(cookie: S) -> Option<Access> {
+    pub fn from_raw(raw: String) -> Option<Access> {
         macro_rules! seat_impl {
-            ($struct:tt, $input:expr; $($name:tt, $k:pat, $ty:ty;)*) => {{
+            ($struct:tt, $input:expr; $($name:ident, $k:pat, $ty:ty;)*; $($rest:tt)*) => {{
                 $(let mut $name: Option<$ty> = None;)*
 
                 for pair in $input.split(';') {
@@ -36,25 +38,27 @@ impl Access {
 
                 Some($struct {
                     $($name: $name?,)*
+                    $($rest)*
                 })
             }};
         }
 
         seat_impl!(
-            Access, cookie.as_ref();
+            Access, raw;
             uid, K_UID, u64;
             key, K_KEY, String;
             csrf, K_CSRF, String;
-            devid3, K_DEVID3, String;
+            devid3, K_DEVID3, String;;
+            raw,
         )
     }
 
-    pub fn as_cookie(&self) -> String {
-        concat_string!(
-            K_UID, "=", self.uid.to_string(), "; ",
-            K_KEY, "=", self.key, "; ",
-            K_CSRF, "=", self.csrf, "; ",
-            K_DEVID3, "=", self.devid3
-        )
-    }
+    // pub fn as_cookie(&self) -> String {
+    //     concat_string!(
+    //         K_UID, "=", self.uid.to_string(), "; ",
+    //         K_KEY, "=", self.key, "; ",
+    //         K_CSRF, "=", self.csrf, "; ",
+    //         K_DEVID3, "=", self.devid3
+    //     )
+    // }
 }
