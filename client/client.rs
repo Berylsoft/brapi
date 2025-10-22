@@ -4,7 +4,7 @@ use hyper::{Request, Response, Body, header::{self, HeaderValue, HeaderMap}};
 use brapi_model::{*, prelude::concat_string};
 use crate::{error::*, access::Access};
 
-pub const WEB_USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36";
+pub const WEB_USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36";
 
 pub type HyperClient = hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>;
 
