@@ -16,7 +16,13 @@ path = "lib.rs"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde_urlencoded = "0.7"
-hyper = { version = "0.14", features = ["http1", "http2", "client", "tcp", "stream"] }
-hyper-rustls = { version = "0.24", default-features = false, features = ["webpki-tokio", "http2"] }
+bytes = "1"
+http = "1"
+http-body-util = "0.1"
+hyper = { version = "1", default-features = false, features = ["client", "http1"] }
+smol-hyper = "0.1"
+async-net = "2"
+async-tls = { version = "0.13", default-features = false, features = ["client"] }
+async-global-executor = "2"
 foundations = { git = "https://github.com/Berylsoft/foundations", features = ["error-enum"] }
 brapi-model = { path = "../model" }

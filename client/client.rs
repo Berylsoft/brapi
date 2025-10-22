@@ -1,24 +1,40 @@
 use std::{collections::BTreeMap, sync::Arc};
 use serde_urlencoded::to_string as to_urlencoded;
-use hyper::{Request, Response, Body, header::{self, HeaderValue, HeaderMap}};
+use bytes::Bytes;
+use http::{Request, Response, header::{self, HeaderValue, HeaderMap}};
+use http_body_util::{BodyExt, Full};
+use hyper::body::Incoming;
 use brapi_model::{*, prelude::concat_string};
 use crate::{error::*, access::Access};
 
 pub const WEB_USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36";
 
-pub type HyperClient = hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>;
+async fn request(req: Request<Full<Bytes>>) -> RestApiResult<Response<Incoming>> {
+    let io = {
+        let host = req.uri().host().unwrap();
 
-fn build_hyper_client() -> HyperClient {
-    let conn = hyper_rustls::HttpsConnectorBuilder::new()
-        .with_webpki_roots()
-        .https_only()
-        .enable_http2()
-        .build();
-    hyper::Client::builder().build(conn)
+        let stream = {
+            let port = req.uri().port_u16().unwrap_or(443);
+            async_net::TcpStream::connect((host, port)).await?
+        };
+        let connector = async_tls::TlsConnector::default();
+        connector.connect(host, stream).await?
+    };
+    let io = smol_hyper::rt::FuturesIo::new(io);
+
+    // Spawn the HTTP/1 connection.
+    let (mut sender, conn) = hyper::client::conn::http1::handshake(io).await?;
+    async_global_executor::spawn(async move {
+        conn.await.unwrap();
+    })
+    .detach();
+
+    // Get the result
+    let result = sender.send_request(req).await?;
+    Ok(result)
 }
 
 pub struct Client {
-    client: HyperClient,
     access: Option<Access>,
     proxy: BTreeMap<BizKind, String>,
 }
@@ -28,7 +44,6 @@ pub type ClientRef = Arc<Client>;
 impl Client {
     fn _new(access: Option<Access>, proxy: Option<BTreeMap<BizKind, String>>) -> ClientRef {
         let client = Client {
-            client: build_hyper_client(),
             access,
             proxy: proxy.unwrap_or_default(),
         };
@@ -77,14 +92,6 @@ impl Client {
         }
     }
 
-    pub fn clone_raw(&self) -> HyperClient {
-        self.client.clone()
-    }
-
-    pub async fn raw_get(&self, url: hyper::Uri) -> HttpResult<Response<Body>> {
-        self.client.get(url).await
-    }
-
     pub async fn call<Req: RestApi>(&self, req: &Req) -> RestApiResult<Req::Response> {
         let host = match self.proxy.get(&Req::BIZ) {
             None => Req::BIZ.host(),
@@ -111,7 +118,7 @@ impl Client {
                     self.set_headers(Req::BIZ, headers);
                 }
 
-                _req.body(Body::empty())
+                _req.body(Full::new(Bytes::new()))
             },
             RestApiRequestMethod::PostForm => {
                 let mut _req = Request::post(url);
@@ -135,7 +142,7 @@ impl Client {
                 );
                 self.set_headers(Req::BIZ, headers);
 
-                _req.body(Body::from(body))
+                _req.body(Full::new(body.into()))
             },
             RestApiRequestMethod::PostJson => {
                 assert_eq!(Req::DEFAULT, None);
@@ -143,10 +150,10 @@ impl Client {
             }
         }.unwrap();
 
-        let resp = self.client.request(req).await?;
+        let resp = request(req).await?;
         let status = resp.status().as_u16();
-        let bytes = hyper::body::to_bytes(resp.into_body()).await?;
-        let text = std::str::from_utf8(bytes.as_ref())?;
+        let body = resp.collect().await?.to_bytes();
+        let text = std::str::from_utf8(body.as_ref())?;
 
         if status == 200 {
             let RestApiResponse { code, message, data }: RestApiResponse<Req::Response> = serde_json::from_str(text)?;

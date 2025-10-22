@@ -17,3 +17,10 @@ brapi-model = { path = "../model" }
 brapi-client = { path = "../client" }
 
 brapi-live = { path = "../live" }
+
+[[example]]
+name = "brapi-example"
+path = "example.rs"
+
+[dev-dependencies]
+async-global-executor = "2"

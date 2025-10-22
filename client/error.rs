@@ -1,4 +1,4 @@
-pub use hyper::{Error as HttpError, Result as HttpResult};
+pub use hyper::{Error as HyperError, Result as HyperResult};
 
 #[derive(Debug)]
 pub enum RestApiFailureCode {
@@ -17,7 +17,8 @@ foundations::error_enum! {
         PostWithoutAccess,
     }
     convert {
-        Network        => HttpError,
+        Io             => std::io::Error,
+        Hyper          => HyperError,
         ParseString    => std::string::FromUtf8Error,
         ParseStr       => std::str::Utf8Error,
         Parse          => serde_json::Error,
