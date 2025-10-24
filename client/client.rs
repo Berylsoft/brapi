@@ -17,7 +17,7 @@ fn build_hyper_client() -> FeaturedHyperClient {
     let https = HttpsConnectorBuilder::new()
         .with_webpki_roots()
         .https_only()
-        .enable_http1()
+        .enable_http2()
         .build();
     HyperClient::builder(TokioExecutor::new()).build(https)
 }
