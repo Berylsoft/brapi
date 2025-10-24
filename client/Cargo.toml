@@ -20,9 +20,7 @@ bytes = "1"
 http = "1"
 http-body-util = "0.1"
 hyper = { version = "1", default-features = false, features = ["client", "http1"] }
-smol-hyper = "0.1"
-async-net = "2"
-async-tls = { version = "0.13", default-features = false, features = ["client"] }
-async-global-executor = "2"
+hyper-util = { version = "0.1", features = ["client-legacy", "http1", "tokio"] }
+hyper-rustls = { version = "0.27", default-features = false, features = ["ring", "http1", "webpki-tokio"] } # aws-lc-rs has build issue
 foundations = { git = "https://github.com/Berylsoft/foundations", features = ["error-enum"] }
 brapi-model = { path = "../model" }

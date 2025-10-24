@@ -1,4 +1,5 @@
-pub use hyper::{Error as HyperError, Result as HyperResult};
+pub use hyper::Error as HyperError;
+pub use hyper_util::client::legacy::Error as HyperClientError;
 
 #[derive(Debug)]
 pub enum RestApiFailureCode {
@@ -19,6 +20,7 @@ foundations::error_enum! {
     convert {
         Io             => std::io::Error,
         Hyper          => HyperError,
+        HyperClient    => HyperClientError,
         ParseString    => std::string::FromUtf8Error,
         ParseStr       => std::str::Utf8Error,
         Parse          => serde_json::Error,

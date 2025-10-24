@@ -23,4 +23,4 @@ name = "brapi-example"
 path = "example.rs"
 
 [dev-dependencies]
-async-global-executor = "2"
+tokio = { version = "1", features = ["full"] }

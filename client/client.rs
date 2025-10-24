@@ -1,40 +1,28 @@
 use std::{collections::BTreeMap, sync::Arc};
 use serde_urlencoded::to_string as to_urlencoded;
 use bytes::Bytes;
-use http::{Request, Response, header::{self, HeaderValue, HeaderMap}};
+use http::{Request, header::{self, HeaderValue, HeaderMap}};
 use http_body_util::{BodyExt, Full};
-use hyper::body::Incoming;
+use hyper_util::{client::legacy::{Client as HyperClient, connect::HttpConnector}, rt::TokioExecutor};
+use hyper_rustls::{HttpsConnector, HttpsConnectorBuilder};
 use brapi_model::{*, prelude::concat_string};
 use crate::{error::*, access::Access};
 
 pub const WEB_USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36";
 
-async fn request(req: Request<Full<Bytes>>) -> RestApiResult<Response<Incoming>> {
-    let io = {
-        let host = req.uri().host().unwrap();
+type FeaturedHyperClient = HyperClient<HttpsConnector<HttpConnector>, Full<Bytes>>;
 
-        let stream = {
-            let port = req.uri().port_u16().unwrap_or(443);
-            async_net::TcpStream::connect((host, port)).await?
-        };
-        let connector = async_tls::TlsConnector::default();
-        connector.connect(host, stream).await?
-    };
-    let io = smol_hyper::rt::FuturesIo::new(io);
-
-    // Spawn the HTTP/1 connection.
-    let (mut sender, conn) = hyper::client::conn::http1::handshake(io).await?;
-    async_global_executor::spawn(async move {
-        conn.await.unwrap();
-    })
-    .detach();
-
-    // Get the result
-    let result = sender.send_request(req).await?;
-    Ok(result)
+fn build_hyper_client() -> FeaturedHyperClient {
+    let https = HttpsConnectorBuilder::new()
+        .with_webpki_roots()
+        .https_only()
+        .enable_http1()
+        .build();
+    HyperClient::builder(TokioExecutor::new()).build(https)
 }
 
 pub struct Client {
+    hyper: FeaturedHyperClient,
     access: Option<Access>,
     proxy: BTreeMap<BizKind, String>,
 }
@@ -44,6 +32,7 @@ pub type ClientRef = Arc<Client>;
 impl Client {
     fn _new(access: Option<Access>, proxy: Option<BTreeMap<BizKind, String>>) -> ClientRef {
         let client = Client {
+            hyper: build_hyper_client(),
             access,
             proxy: proxy.unwrap_or_default(),
         };
@@ -150,7 +139,7 @@ impl Client {
             }
         }.unwrap();
 
-        let resp = request(req).await?;
+        let resp = self.hyper.request(req).await?;
         let status = resp.status().as_u16();
         let body = resp.collect().await?.to_bytes();
         let text = std::str::from_utf8(body.as_ref())?;
