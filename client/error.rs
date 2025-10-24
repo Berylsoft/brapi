@@ -17,6 +17,7 @@ foundations::error_enum! {
             rate_limited: bool,
         },
         PostWithoutAccess,
+        ParseWbiImg,
     }
     convert {
         Io             => std::io::Error,
