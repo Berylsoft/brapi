@@ -1,5 +1,6 @@
-pub use hyper::Error as HyperError;
+pub use hyper::{Error as HyperError, Result as HyperResult};
 pub use hyper_util::client::legacy::Error as HyperClientError;
+pub type HyperClientResult<T> = Result<T, HyperClientError>;
 
 #[derive(Debug)]
 pub enum RestApiFailureCode {

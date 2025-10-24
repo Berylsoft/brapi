@@ -1,8 +1,9 @@
 use std::{collections::BTreeMap, sync::Arc};
 use serde_urlencoded::to_string as to_urlencoded;
 use bytes::Bytes;
-use http::{Request, header::{self, HeaderValue, HeaderMap}};
+use http::{Request, Response, header::{self, HeaderValue, HeaderMap}};
 use http_body_util::{BodyExt, Full};
+use hyper::body::Incoming;
 use hyper_util::{client::legacy::{Client as HyperClient, connect::HttpConnector}, rt::TokioExecutor};
 use hyper_rustls::{HttpsConnector, HttpsConnectorBuilder};
 use brapi_model::{*, prelude::concat_string};
@@ -79,6 +80,20 @@ impl Client {
             Some(access) => Ok(access.csrf.as_str()),
             None => Err(RestApiError::PostWithoutAccess),
         }
+    }
+
+    pub fn clone_raw(&self) -> FeaturedHyperClient {
+        self.hyper.clone()
+    }
+
+    pub async fn raw_get(&self, url: http::Uri) -> HyperClientResult<Response<Incoming>> {
+        self.hyper.get(url).await
+    }
+
+    pub async fn raw_get_bytes(&self, url: http::Uri) -> RestApiResult<Response<Bytes>> {
+        let (parts, body) = self.hyper.get(url).await?.into_parts();
+        let body = body.collect().await?.to_bytes();
+        Ok(Response::from_parts(parts, body))
     }
 
     pub async fn call<Req: RestApi>(&self, req: &Req) -> RestApiResult<Req::Response> {
