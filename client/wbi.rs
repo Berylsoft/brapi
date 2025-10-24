@@ -10,11 +10,15 @@ fn split_key(url: &str) -> Option<&str> {
 
 fn get_key(basic_info: BasicInfo) -> RestApiResult<[u8; 32]> {
     let BasicInfo { wbi_img: WbiImg { img_url, sub_url } } = basic_info;
-    let mut full = String::with_capacity(64); // TODO remapping to avoid this buffer
-    full.push_str(split_key(&img_url).ok_or(RestApiError::ParseWbiImg)?);
-    full.push_str(split_key(&sub_url).ok_or(RestApiError::ParseWbiImg)?);
-    let full_bytes = full.as_bytes();
-    let key = KEY_LUT.map(|n| full_bytes[n as usize]);
+    let img_url_bytes = split_key(&img_url).ok_or(RestApiError::ParseWbiImg)?.as_bytes();
+    let sub_url_bytes = split_key(&sub_url).ok_or(RestApiError::ParseWbiImg)?.as_bytes();
+    let key = KEY_LUT.map(|n| {
+        if n < 32 {
+            img_url_bytes[n as usize]
+        } else {
+            sub_url_bytes[(n - 32) as usize]
+        }
+    });
     Ok(key)
 }
 
