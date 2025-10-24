@@ -8,16 +8,13 @@ fn split_key(url: &str) -> Option<&str> {
     Some(s)
 }
 
-fn get_key(basic_info: BasicInfo) -> RestApiResult<Vec<u8>> {
+fn get_key(basic_info: BasicInfo) -> RestApiResult<[u8; 32]> {
     let BasicInfo { wbi_img: WbiImg { img_url, sub_url } } = basic_info;
     let mut full = String::with_capacity(64); // TODO remapping to avoid this buffer
     full.push_str(split_key(&img_url).ok_or(RestApiError::ParseWbiImg)?);
     full.push_str(split_key(&sub_url).ok_or(RestApiError::ParseWbiImg)?);
     let full_bytes = full.as_bytes();
-    let key = KEY_LUT
-        .iter()
-        .map(|n| full_bytes[*n as usize])
-        .collect();
+    let key = KEY_LUT.map(|n| full_bytes[n as usize]);
     Ok(key)
 }
 
@@ -41,7 +38,7 @@ mod tests {
         } };
         assert_eq!(
             get_key(basic_info).unwrap(),
-            "ea1db124af3c7062474693fa704f4ff8".as_bytes(),
+            *b"ea1db124af3c7062474693fa704f4ff8",
         );
     }
 }
