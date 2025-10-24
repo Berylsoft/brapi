@@ -25,6 +25,7 @@ foundations::error_enum! {
         ParseStr       => std::str::Utf8Error,
         Parse          => serde_json::Error,
         EncodePostBody => serde_urlencoded::ser::Error,
+        // InvalidHeaderValue
     }
 }
 
