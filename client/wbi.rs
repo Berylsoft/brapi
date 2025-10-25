@@ -8,7 +8,7 @@ fn split_key(url: &str) -> Option<&str> {
     Some(s)
 }
 
-fn get_key(basic_info: BasicInfo) -> RestApiResult<[u8; 32]> {
+pub fn get_key(basic_info: BasicInfo) -> RestApiResult<[u8; 32]> {
     let BasicInfo { wbi_img: WbiImg { img_url, sub_url } } = basic_info;
     let img_url_bytes = split_key(&img_url).ok_or(RestApiError::ParseWbiImg)?.as_bytes();
     let sub_url_bytes = split_key(&sub_url).ok_or(RestApiError::ParseWbiImg)?.as_bytes();
@@ -22,7 +22,7 @@ fn get_key(basic_info: BasicInfo) -> RestApiResult<[u8; 32]> {
     Ok(key)
 }
 
-fn sign(orig_params: String, key: &[u8; 32], ts: u64) -> RestApiResult<String> {
+pub fn sign(orig_params: String, key: &[u8; 32], ts: u64) -> RestApiResult<String> {
     // assume all desered strings have no special chars
     let mut deser_params: Vec<(String, String)> = serde_urlencoded::from_str(&orig_params)?;
     deser_params.push(("wts".to_owned(), ts.to_string()));

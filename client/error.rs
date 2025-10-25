@@ -18,6 +18,7 @@ foundations::error_enum! {
         },
         PostWithoutAccess,
         ParseWbiImg,
+        NoWbiKey,
     }
     convert {
         Io             => std::io::Error,

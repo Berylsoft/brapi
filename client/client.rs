@@ -26,6 +26,7 @@ pub struct Client {
     hyper: FeaturedHyperClient,
     access: Option<Access>,
     proxy: BTreeMap<BizKind, String>,
+    wbi_key: Option<[u8; 32]>,
 }
 
 pub type ClientRef = Arc<Client>;
@@ -36,6 +37,7 @@ impl Client {
             hyper: build_hyper_client(),
             access,
             proxy: proxy.unwrap_or_default(),
+            wbi_key: None,
         };
         Arc::new(client)
     }
@@ -96,6 +98,13 @@ impl Client {
         Ok(Response::from_parts(parts, body))
     }
 
+    pub async fn update_wbi_key(&mut self) -> RestApiResult<()> {
+        let basic_info = self.call(&wbi_api::GetBasicInfo).await?;
+        let key = wbi::get_key(basic_info)?;
+        self.wbi_key = Some(key);
+        Ok(())
+    }
+
     pub async fn call<Req: RestApi>(&self, req: &Req) -> RestApiResult<Req::Response> {
         let host = match self.proxy.get(&Req::BIZ) {
             None => Req::BIZ.host(),
@@ -105,7 +114,6 @@ impl Client {
 
         let req = match Req::METHOD {
             RestApiRequestMethod::BareGet | RestApiRequestMethod::Get => {
-                fn wbi_sign(orig_params: String) -> String { orig_params }
                 let (dir, ts, _) = foundations::now::now_raw();
                 assert!(dir);
 
@@ -115,7 +123,8 @@ impl Client {
                     orig_params.push_str(default);
                 }
                 let params = if Req::WBI {
-                    wbi_sign(orig_params)
+                    let key_ref = &self.wbi_key.ok_or(RestApiError::NoWbiKey)?;
+                    wbi::sign(orig_params, key_ref, ts)?
                 } else {
                     orig_params
                 };
