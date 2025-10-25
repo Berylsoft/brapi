@@ -24,5 +24,6 @@ http-body-util = "0.1"
 hyper = { version = "1", default-features = false, features = ["client", "http2"] }
 hyper-util = { version = "0.1", features = ["client-legacy", "http2", "tokio"] }
 hyper-rustls = { version = "0.27", default-features = false, features = ["ring", "http2", "webpki-tokio"] } # aws-lc-rs has build issue
+tokio = { version = "1", features = ["sync"] }
 foundations = { git = "https://github.com/Berylsoft/foundations", features = ["error-enum", "now"] }
 brapi-model = { path = "../model" }

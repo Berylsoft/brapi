@@ -6,6 +6,7 @@ use http_body_util::{BodyExt, Full};
 use hyper::body::Incoming;
 use hyper_util::{client::legacy::{Client as HyperClient, connect::HttpConnector}, rt::TokioExecutor};
 use hyper_rustls::{HttpsConnector, HttpsConnectorBuilder};
+use tokio::sync::RwLock;
 use brapi_model::{*, prelude::concat_string};
 use crate::{error::*, access::Access, wbi, wbi_api};
 
@@ -26,7 +27,7 @@ pub struct Client {
     hyper: FeaturedHyperClient,
     access: Option<Access>,
     proxy: BTreeMap<BizKind, String>,
-    wbi_key: Option<[u8; 32]>,
+    wbi_key: RwLock<Option<[u8; 32]>>,
 }
 
 pub type ClientRef = Arc<Client>;
@@ -37,7 +38,7 @@ impl Client {
             hyper: build_hyper_client(),
             access,
             proxy: proxy.unwrap_or_default(),
-            wbi_key: None,
+            wbi_key: RwLock::new(None),
         };
         Arc::new(client)
     }
@@ -98,10 +99,11 @@ impl Client {
         Ok(Response::from_parts(parts, body))
     }
 
-    pub async fn update_wbi_key(&mut self) -> RestApiResult<()> {
+    pub async fn update_wbi_key(&self) -> RestApiResult<()> {
         let basic_info = self.call(&wbi_api::GetBasicInfo).await?;
-        let key = wbi::get_key(basic_info)?;
-        self.wbi_key = Some(key);
+        let new_key = wbi::get_key(basic_info)?;
+        let mut key_ref = self.wbi_key.write().await;
+        key_ref.replace(new_key);
         Ok(())
     }
 
@@ -123,7 +125,7 @@ impl Client {
                     orig_params.push_str(default);
                 }
                 let params = if Req::WBI {
-                    let key_ref = &self.wbi_key.ok_or(RestApiError::NoWbiKey)?;
+                    let key_ref = &self.wbi_key.read().await.ok_or(RestApiError::NoWbiKey)?;
                     wbi::sign(orig_params, key_ref, ts)?
                 } else {
                     orig_params
