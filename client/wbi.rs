@@ -31,10 +31,19 @@ pub fn sign(orig_params: String, key: &[u8; 32], ts: u64) -> RestApiResult<Strin
     let mut md5_ctx = md5::Context::new();
     md5_ctx.consume(&tosign_params);
     md5_ctx.consume(key);
-    let md5 = format!("{:?}", md5_ctx.finalize());
-    deser_params.push(("w_rid".to_owned(), md5));
-    deser_params.sort_by(|a, b| a.0.cmp(&b.0));
-    let final_params = serde_urlencoded::to_string(deser_params)?;
+    let w_rid = format!("{:?}", md5_ctx.finalize());
+    let mut final_deser_params = Vec::with_capacity(deser_params.len() + 1);
+    let mut wts_slot = None;
+    for item in deser_params {
+        if item.0 == "wts" {
+            assert!(matches!(wts_slot.replace(item), None));
+        } else {
+            final_deser_params.push(item);
+        }
+    }
+    final_deser_params.push(("w_rid".to_owned(), w_rid));
+    final_deser_params.push(wts_slot.unwrap());
+    let final_params = serde_urlencoded::to_string(final_deser_params)?;
     Ok(final_params)
 }
 
@@ -75,7 +84,15 @@ mod tests {
                 b"ea1db124af3c7062474693fa704f4ff8",
                 1702204169
             ).unwrap(),
-            "bar=514&foo=114&w_rid=8f6f2b5b3d485fe1886cec6a0be8c5d4&wts=1702204169&zab=1919810".to_owned(),
-        )
+            "bar=514&foo=114&zab=1919810&w_rid=8f6f2b5b3d485fe1886cec6a0be8c5d4&wts=1702204169".to_owned(),
+        );
+        assert_eq!(
+            sign(
+                "id=5440&type=0&web_location=444.8".to_owned(),
+                b"ea1db124af3c7062474693fa704f4ff8",
+                1761421538
+            ).unwrap(),
+            "id=5440&type=0&web_location=444.8&w_rid=3edf41f048e625e8a612a56c36c5bb29&wts=1761421538".to_owned(),
+        );
     }
 }
