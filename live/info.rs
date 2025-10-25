@@ -10,7 +10,6 @@ impl RestApi for GetRoomInfo {
     const BIZ: BizKind = BizKind::Live;
     const METHOD: RestApiRequestMethod = RestApiRequestMethod::BareGet;
     const PATH: &'static str = "/room/v1/Room/get_info";
-    const DEFAULT: Option<&'static str> = None;
     type Response = RoomInfo;
 }
 
@@ -66,7 +65,6 @@ impl RestApi for GetUserInfo {
     const BIZ: BizKind = BizKind::Live;
     const METHOD: RestApiRequestMethod = RestApiRequestMethod::BareGet;
     const PATH: &'static str = "/live_user/v1/UserInfo/get_anchor_in_room";
-    const DEFAULT: Option<&'static str> = None;
     type Response = UserInfo;
 }
 
@@ -80,7 +78,6 @@ impl RestApi for GetExtRoomInfo {
     const BIZ: BizKind = BizKind::Live;
     const METHOD: RestApiRequestMethod = RestApiRequestMethod::BareGet;
     const PATH: &'static str = "/xlive/web-room/v1/index/getH5InfoByRoom";
-    const DEFAULT: Option<&'static str> = None;
     type Response = ExtRoomInfo;
 }
 

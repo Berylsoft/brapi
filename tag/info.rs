@@ -10,7 +10,6 @@ impl RestApi for GetTagInfo {
     const BIZ: BizKind = BizKind::Common { from: Some(CommonFrom::LegacyDynamic) };
     const METHOD: RestApiRequestMethod = RestApiRequestMethod::BareGet;
     const PATH: &'static str = "/x/tag/info";
-    const DEFAULT: Option<&'static str> = None;
     type Response = TagInfo;
 }
 
@@ -70,7 +69,6 @@ impl RestApi for GetExtTagInfo {
     const BIZ: BizKind = BizKind::LegacyDynamic;
     const METHOD: RestApiRequestMethod = RestApiRequestMethod::BareGet;
     const PATH: &'static str = "/topic_svr/v1/topic_svr/get_active_users";
-    const DEFAULT: Option<&'static str> = None;
     type Response = ExtTagInfo;
 }
 

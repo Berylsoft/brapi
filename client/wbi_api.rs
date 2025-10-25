@@ -18,6 +18,5 @@ impl RestApi for GetBasicInfo {
     const BIZ: BizKind = BizKind::Common { from: None };
     const METHOD: RestApiRequestMethod = RestApiRequestMethod::Get;
     const PATH: &'static str = "/x/web-interface/nav";
-    const DEFAULT: Option<&'static str> = None;
     type Response = BasicInfo;
 }
