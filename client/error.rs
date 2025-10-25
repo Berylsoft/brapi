@@ -26,7 +26,8 @@ foundations::error_enum! {
         ParseString    => std::string::FromUtf8Error,
         ParseStr       => std::str::Utf8Error,
         Parse          => serde_json::Error,
-        EncodePostBody => serde_urlencoded::ser::Error,
+        EncodePostBodyOrWbiSignSer => serde_urlencoded::ser::Error,
+        WbiSignDeser   => serde_urlencoded::de::Error,
         // InvalidHeaderValue
     }
 }

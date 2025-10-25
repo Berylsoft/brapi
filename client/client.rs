@@ -7,7 +7,7 @@ use hyper::body::Incoming;
 use hyper_util::{client::legacy::{Client as HyperClient, connect::HttpConnector}, rt::TokioExecutor};
 use hyper_rustls::{HttpsConnector, HttpsConnectorBuilder};
 use brapi_model::{*, prelude::concat_string};
-use crate::{error::*, access::Access};
+use crate::{error::*, access::Access, wbi, wbi_api};
 
 pub const WEB_USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36";
 
@@ -106,6 +106,8 @@ impl Client {
         let req = match Req::METHOD {
             RestApiRequestMethod::BareGet | RestApiRequestMethod::Get => {
                 fn wbi_sign(orig_params: String) -> String { orig_params }
+                let (dir, ts, _) = foundations::now::now_raw();
+                assert!(dir);
 
                 let mut orig_params = to_urlencoded(req)?;
                 if let Some(default) = Req::DEFAULT {
