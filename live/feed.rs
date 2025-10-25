@@ -25,5 +25,6 @@ impl RestApi for GetHostsInfo {
     const METHOD: RestApiRequestMethod = RestApiRequestMethod::Get;
     const PATH: &'static str = "/xlive/web-room/v1/index/getDanmuInfo";
     const DEFAULT: Option<&'static str> = Some("type=0&web_location=444.8");
+    const WBI: bool = true;
     type Response = HostsInfo;
 }

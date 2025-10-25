@@ -45,6 +45,7 @@ pub trait RestApi: Serialize {
     const METHOD: RestApiRequestMethod;
     const PATH: &'static str;
     const DEFAULT: Option<&'static str>;
+    const WBI: bool = false;
     type Response: DeserializeOwned;
 }
 
