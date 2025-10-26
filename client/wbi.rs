@@ -24,9 +24,10 @@ pub fn get_key(basic_info: BasicInfo) -> RestApiResult<[u8; 32]> {
 
 pub fn sign(orig_params: String, key: &[u8; 32], ts: u64) -> RestApiResult<String> {
     // assume all desered strings have no special chars
-    let mut deser_params: Vec<(String, String)> = serde_urlencoded::from_str(&orig_params)?;
-    deser_params.push(("wts".to_owned(), ts.to_string()));
-    deser_params.sort_by(|a, b| a.0.cmp(&b.0));
+    let mut deser_params: Vec<(&str, &str)> = serde_urlencoded::from_str(&orig_params)?;
+    let wts = ts.to_string();
+    deser_params.push(("wts", wts.as_str()));
+    deser_params.sort_by(|a, b| a.0.cmp(b.0));
     let tosign_params = serde_urlencoded::to_string(&deser_params)?;
     let mut md5_ctx = md5::Context::new();
     md5_ctx.consume(&tosign_params);
@@ -41,7 +42,7 @@ pub fn sign(orig_params: String, key: &[u8; 32], ts: u64) -> RestApiResult<Strin
             final_deser_params.push(item);
         }
     }
-    final_deser_params.push(("w_rid".to_owned(), w_rid));
+    final_deser_params.push(("w_rid", w_rid.as_str()));
     final_deser_params.push(wts_slot.unwrap());
     let final_params = serde_urlencoded::to_string(final_deser_params)?;
     Ok(final_params)
