@@ -116,15 +116,14 @@ impl Client {
 
         let req = match Req::METHOD {
             RestApiRequestMethod::BareGet | RestApiRequestMethod::Get => {
-                let (dir, ts, _) = foundations::now::now_raw();
-                assert!(dir);
-
                 let mut orig_params = to_urlencoded(req)?;
                 if let Some(default) = Req::DEFAULT {
                     orig_params.push_str("&");
                     orig_params.push_str(default);
                 }
                 let params = if Req::WBI {
+                    let (dir, ts, _) = foundations::now::now_raw();
+                    assert!(dir);
                     let key_ref = &self.wbi_key.read().await.ok_or(RestApiError::NoWbiKey)?;
                     wbi::sign(orig_params, key_ref, ts)?
                 } else {
